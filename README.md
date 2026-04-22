@@ -254,6 +254,38 @@ Performance depends heavily on model size, quantization, platform, and whether y
 - Use `WhisperModel.base` or `WhisperModel.small` for more practical mobile defaults.
 - Use `WhisperModel.largeV3Turbo` when you want the best accuracy and can afford the memory and runtime cost.
 
+## Custom fork notes (Voice Note AI)
+
+This fork includes targeted iOS-side changes in `ios/Classes/whisper_flutter_plus.cpp` to improve short-note latency and reduce runtime surprises.
+
+### What was changed
+
+- **Adaptive thread clamping** for short clips via `clamp_thread_count(...)`:
+  - lower thread count for very short audio to reduce scheduling overhead
+  - conservative upper bound for Turbo models
+- **Text-only mode optimization**:
+  - `wparams.no_timestamps` is now explicitly wired from request input
+  - when `no_timestamps=true`, VAD is disabled to avoid extra overhead
+- **Sampling strategy adjustment for speed paths**:
+  - Turbo can use greedy sampling when `speed_up=true` or `no_timestamps=true`
+  - beam search is still used for non-speed-focused Turbo runs
+- **Lower native logging overhead**:
+  - debug `fprintf` logs now run only when `is_verbose=true`
+- **Safer JSON request parsing**:
+  - replaced strict `jsonBody["..."]` reads with `jsonBody.value(...)` defaults to avoid malformed/missing-key crashes
+
+### Why this is faster in practice
+
+- Short recordings (common in voice notes) often perform better with fewer CPU threads.
+- Disabling unnecessary VAD and timestamps in text-only flows removes extra native work.
+- Greedy decoding on speed-oriented paths reduces decoding cost on Turbo.
+
+### Stability and compatibility notes
+
+- Exported FFI symbols remain unchanged (`vpnai_whisper_request`, `vpnai_whisper_free_string`).
+- iOS context is still configured with `use_gpu=false` and `flash_attn=false` in this fork for stability-first behavior.
+- Behavior for standard timestamped transcription remains compatible with existing API calls.
+
 ## Optional CoreML acceleration on iOS and macOS
 
 This section is only for Apple-platform acceleration. It is not required for Android, Linux, Windows, or standard CPU/GPU usage on Apple platforms.
