@@ -11,6 +11,10 @@ extern "C"
 {
 #endif
 
+    FUNCTION_ATTRIBUTE char *vpnai_whisper_request(char *body);
+    FUNCTION_ATTRIBUTE void vpnai_whisper_free_string(char *ptr);
+
+    // Backward-compatible aliases for older callers.
     FUNCTION_ATTRIBUTE char *request(char *body);
     FUNCTION_ATTRIBUTE void free_string(char *ptr);
 

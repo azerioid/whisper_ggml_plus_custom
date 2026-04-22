@@ -293,7 +293,7 @@ json transcribe(json jsonBody)
 
 extern "C"
 {
-    FUNCTION_ATTRIBUTE char *request(char *body)
+    FUNCTION_ATTRIBUTE char *vpnai_whisper_request(char *body)
     {
         try {
             json jsonBody = json::parse(body);
@@ -318,8 +318,19 @@ extern "C"
         }
     }
 
-    FUNCTION_ATTRIBUTE void free_string(char *ptr)
+    FUNCTION_ATTRIBUTE void vpnai_whisper_free_string(char *ptr)
     {
         delete[] ptr;
+    }
+
+    // Legacy aliases kept for compatibility with older app builds.
+    FUNCTION_ATTRIBUTE char *request(char *body)
+    {
+        return vpnai_whisper_request(body);
+    }
+
+    FUNCTION_ATTRIBUTE void free_string(char *ptr)
+    {
+        vpnai_whisper_free_string(ptr);
     }
 }
