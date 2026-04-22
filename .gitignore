@@ -1,0 +1,33 @@
+# Dart / Flutter
+.dart_tool/
+.packages
+.pub/
+build/
+
+# IntelliJ / VS Code
+.idea/
+.vscode/
+*.iml
+
+# macOS
+.DS_Store
+
+# Native / platform generated outputs
+android/.cxx/
+android/local.properties
+example/android/.gradle/
+example/android/local.properties
+example/ios/Pods/
+example/ios/Podfile.lock
+example/macos/Pods/
+example/macos/Podfile.lock
+example/.dart_tool/
+example/build/
+linux/flutter/ephemeral/
+macos/Flutter/ephemeral/
+windows/flutter/ephemeral/
+
+# Test / logs
+coverage/
+*.log
+
