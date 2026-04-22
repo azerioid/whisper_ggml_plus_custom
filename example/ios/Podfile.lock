@@ -1,0 +1,40 @@
+PODS:
+  - ffmpeg_kit_flutter_new_min (7.1.1):
+    - ffmpeg_kit_flutter_new_min/min (= 7.1.1)
+    - Flutter
+  - ffmpeg_kit_flutter_new_min/min (7.1.1):
+    - Flutter
+  - Flutter (1.0.0)
+  - record_ios (1.1.0):
+    - Flutter
+  - whisper_ggml_plus (1.2.3):
+    - Flutter
+    - whisper_ggml_plus/no-arc (= 1.2.3)
+  - whisper_ggml_plus/no-arc (1.2.3):
+    - Flutter
+
+DEPENDENCIES:
+  - ffmpeg_kit_flutter_new_min (from `.symlinks/plugins/ffmpeg_kit_flutter_new_min/ios`)
+  - Flutter (from `Flutter`)
+  - record_ios (from `.symlinks/plugins/record_ios/ios`)
+  - whisper_ggml_plus (from `.symlinks/plugins/whisper_ggml_plus/ios`)
+
+EXTERNAL SOURCES:
+  ffmpeg_kit_flutter_new_min:
+    :path: ".symlinks/plugins/ffmpeg_kit_flutter_new_min/ios"
+  Flutter:
+    :path: Flutter
+  record_ios:
+    :path: ".symlinks/plugins/record_ios/ios"
+  whisper_ggml_plus:
+    :path: ".symlinks/plugins/whisper_ggml_plus/ios"
+
+SPEC CHECKSUMS:
+  ffmpeg_kit_flutter_new_min: 85493896be79f45e846b5c9b23a3bf73eb284c4a
+  Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
+  record_ios: f75fa1d57f840012775c0e93a38a7f3ceea1a374
+  whisper_ggml_plus: 4dc475f980ce87fa25bc5e8e4b1efbc8d68b1456
+
+PODFILE CHECKSUM: 72ee454c4ec33a988dcc600fc0a7454db5597cae
+
+COCOAPODS: 1.16.2
