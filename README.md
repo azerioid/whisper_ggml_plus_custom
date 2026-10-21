@@ -274,6 +274,12 @@ This fork includes targeted iOS-side changes in `ios/Classes/whisper_flutter_plu
 - **Safer JSON request parsing**:
   - replaced strict `jsonBody["..."]` reads with `jsonBody.value(...)` defaults to avoid malformed/missing-key crashes
 
+- **Detected language in the response** (`v1.5.2-vna.3`): every transcribe
+  result carries `language` (`WhisperTranscribeResponse.language`), the
+  language whisper actually used — the detected one when the request asked
+  for `auto`. Long recordings split into chunks can pin it after the first
+  chunk instead of re-detecting per chunk. iOS, Android and macOS.
+
 ### Why this is faster in practice
 
 - Short recordings (common in voice notes) often perform better with fewer CPU threads.

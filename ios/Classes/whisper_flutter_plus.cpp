@@ -355,6 +355,11 @@ json transcribe(json jsonBody)
     }
     
     jsonResult["text"] = text_result;
+    // Language whisper actually used (the detected one when language is
+    // "auto"), so callers can pin it for the following chunks of a long
+    // recording instead of re-detecting per chunk.
+    const int lang_id = whisper_full_lang_id(g_ctx);
+    jsonResult["language"] = lang_id >= 0 ? whisper_lang_str(lang_id) : "";
     return jsonResult;
 }
 

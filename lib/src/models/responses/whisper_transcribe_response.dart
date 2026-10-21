@@ -15,6 +15,10 @@ abstract class WhisperTranscribeResponse with _$WhisperTranscribeResponse {
     required String text,
     @JsonKey(name: 'segments')
     required List<WhisperTranscribeSegment>? segments,
+
+    /// ISO 639-1 code whisper used; the detected one when the request's
+    /// language was "auto". Null with older native builds.
+    String? language,
   }) = _WhisperTranscribeResponse;
 
   const WhisperTranscribeResponse._();
