@@ -21,6 +21,10 @@ abstract class TranscribeRequest with _$TranscribeRequest {
     @Default(false) bool noFallback,
     @Default(false) bool diarize,
     @Default(false) bool speedUp,
+    /// iOS: run the encoder/decoder on Metal (whisper_context_params.use_gpu).
+    @Default(false) bool useGpu,
+    /// Flash attention (only meaningful with [useGpu]).
+    @Default(false) bool flashAttn,
     @Default(WhisperVadMode.auto) WhisperVadMode vadMode,
     String? vadModelPath,
     @Default(null) Stream<String>? realtimeStream,

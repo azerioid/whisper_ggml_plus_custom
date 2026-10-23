@@ -37,6 +37,10 @@ mixin _$TranscribeRequestDto {
   bool get diarize;
   @JsonKey(name: 'speed_up')
   bool get speedUp;
+  @JsonKey(name: 'use_gpu')
+  bool get useGpu;
+  @JsonKey(name: 'flash_attn')
+  bool get flashAttn;
   @JsonKey(name: 'vad_mode')
   String get vadMode;
   @JsonKey(name: 'vad_model_path')
@@ -81,6 +85,9 @@ mixin _$TranscribeRequestDto {
                 other.isRealtime == isRealtime) &&
             (identical(other.diarize, diarize) || other.diarize == diarize) &&
             (identical(other.speedUp, speedUp) || other.speedUp == speedUp) &&
+            (identical(other.useGpu, useGpu) || other.useGpu == useGpu) &&
+            (identical(other.flashAttn, flashAttn) ||
+                other.flashAttn == flashAttn) &&
             (identical(other.vadMode, vadMode) || other.vadMode == vadMode) &&
             (identical(other.vadModelPath, vadModelPath) ||
                 other.vadModelPath == vadModelPath));
@@ -104,12 +111,14 @@ mixin _$TranscribeRequestDto {
       isRealtime,
       diarize,
       speedUp,
+      useGpu,
+      flashAttn,
       vadMode,
       vadModelPath);
 
   @override
   String toString() {
-    return 'TranscribeRequestDto(audio: $audio, model: $model, isTranslate: $isTranslate, threads: $threads, isVerbose: $isVerbose, language: $language, isSpecialTokens: $isSpecialTokens, isNoTimestamps: $isNoTimestamps, nProcessors: $nProcessors, splitOnWord: $splitOnWord, noFallback: $noFallback, isRealtime: $isRealtime, diarize: $diarize, speedUp: $speedUp, vadMode: $vadMode, vadModelPath: $vadModelPath)';
+    return 'TranscribeRequestDto(audio: $audio, model: $model, isTranslate: $isTranslate, threads: $threads, isVerbose: $isVerbose, language: $language, isSpecialTokens: $isSpecialTokens, isNoTimestamps: $isNoTimestamps, nProcessors: $nProcessors, splitOnWord: $splitOnWord, noFallback: $noFallback, isRealtime: $isRealtime, diarize: $diarize, speedUp: $speedUp, useGpu: $useGpu, flashAttn: $flashAttn, vadMode: $vadMode, vadModelPath: $vadModelPath)';
   }
 }
 
@@ -134,6 +143,8 @@ abstract mixin class $TranscribeRequestDtoCopyWith<$Res> {
       @JsonKey(name: 'is_realtime') bool isRealtime,
       bool diarize,
       @JsonKey(name: 'speed_up') bool speedUp,
+      @JsonKey(name: 'use_gpu') bool useGpu,
+      @JsonKey(name: 'flash_attn') bool flashAttn,
       @JsonKey(name: 'vad_mode') String vadMode,
       @JsonKey(name: 'vad_model_path') String? vadModelPath});
 }
@@ -165,6 +176,8 @@ class _$TranscribeRequestDtoCopyWithImpl<$Res>
     Object? isRealtime = null,
     Object? diarize = null,
     Object? speedUp = null,
+    Object? useGpu = null,
+    Object? flashAttn = null,
     Object? vadMode = null,
     Object? vadModelPath = freezed,
   }) {
@@ -224,6 +237,14 @@ class _$TranscribeRequestDtoCopyWithImpl<$Res>
       speedUp: null == speedUp
           ? _self.speedUp
           : speedUp // ignore: cast_nullable_to_non_nullable
+              as bool,
+      useGpu: null == useGpu
+          ? _self.useGpu
+          : useGpu // ignore: cast_nullable_to_non_nullable
+              as bool,
+      flashAttn: null == flashAttn
+          ? _self.flashAttn
+          : flashAttn // ignore: cast_nullable_to_non_nullable
               as bool,
       vadMode: null == vadMode
           ? _self.vadMode
@@ -345,6 +366,8 @@ extension TranscribeRequestDtoPatterns on TranscribeRequestDto {
             @JsonKey(name: 'is_realtime') bool isRealtime,
             bool diarize,
             @JsonKey(name: 'speed_up') bool speedUp,
+            @JsonKey(name: 'use_gpu') bool useGpu,
+            @JsonKey(name: 'flash_attn') bool flashAttn,
             @JsonKey(name: 'vad_mode') String vadMode,
             @JsonKey(name: 'vad_model_path') String? vadModelPath)?
         $default, {
@@ -368,6 +391,8 @@ extension TranscribeRequestDtoPatterns on TranscribeRequestDto {
             _that.isRealtime,
             _that.diarize,
             _that.speedUp,
+            _that.useGpu,
+            _that.flashAttn,
             _that.vadMode,
             _that.vadModelPath);
       case _:
@@ -405,6 +430,8 @@ extension TranscribeRequestDtoPatterns on TranscribeRequestDto {
             @JsonKey(name: 'is_realtime') bool isRealtime,
             bool diarize,
             @JsonKey(name: 'speed_up') bool speedUp,
+            @JsonKey(name: 'use_gpu') bool useGpu,
+            @JsonKey(name: 'flash_attn') bool flashAttn,
             @JsonKey(name: 'vad_mode') String vadMode,
             @JsonKey(name: 'vad_model_path') String? vadModelPath)
         $default,
@@ -427,6 +454,8 @@ extension TranscribeRequestDtoPatterns on TranscribeRequestDto {
             _that.isRealtime,
             _that.diarize,
             _that.speedUp,
+            _that.useGpu,
+            _that.flashAttn,
             _that.vadMode,
             _that.vadModelPath);
       case _:
@@ -463,6 +492,8 @@ extension TranscribeRequestDtoPatterns on TranscribeRequestDto {
             @JsonKey(name: 'is_realtime') bool isRealtime,
             bool diarize,
             @JsonKey(name: 'speed_up') bool speedUp,
+            @JsonKey(name: 'use_gpu') bool useGpu,
+            @JsonKey(name: 'flash_attn') bool flashAttn,
             @JsonKey(name: 'vad_mode') String vadMode,
             @JsonKey(name: 'vad_model_path') String? vadModelPath)?
         $default,
@@ -485,6 +516,8 @@ extension TranscribeRequestDtoPatterns on TranscribeRequestDto {
             _that.isRealtime,
             _that.diarize,
             _that.speedUp,
+            _that.useGpu,
+            _that.flashAttn,
             _that.vadMode,
             _that.vadModelPath);
       case _:
@@ -511,6 +544,8 @@ class _TranscribeRequestDto extends TranscribeRequestDto {
       @JsonKey(name: 'is_realtime') required this.isRealtime,
       required this.diarize,
       @JsonKey(name: 'speed_up') required this.speedUp,
+      @JsonKey(name: 'use_gpu') required this.useGpu,
+      @JsonKey(name: 'flash_attn') required this.flashAttn,
       @JsonKey(name: 'vad_mode') required this.vadMode,
       @JsonKey(name: 'vad_model_path') this.vadModelPath})
       : super._();
@@ -554,6 +589,12 @@ class _TranscribeRequestDto extends TranscribeRequestDto {
   @override
   @JsonKey(name: 'speed_up')
   final bool speedUp;
+  @override
+  @JsonKey(name: 'use_gpu')
+  final bool useGpu;
+  @override
+  @JsonKey(name: 'flash_attn')
+  final bool flashAttn;
   @override
   @JsonKey(name: 'vad_mode')
   final String vadMode;
@@ -605,6 +646,9 @@ class _TranscribeRequestDto extends TranscribeRequestDto {
                 other.isRealtime == isRealtime) &&
             (identical(other.diarize, diarize) || other.diarize == diarize) &&
             (identical(other.speedUp, speedUp) || other.speedUp == speedUp) &&
+            (identical(other.useGpu, useGpu) || other.useGpu == useGpu) &&
+            (identical(other.flashAttn, flashAttn) ||
+                other.flashAttn == flashAttn) &&
             (identical(other.vadMode, vadMode) || other.vadMode == vadMode) &&
             (identical(other.vadModelPath, vadModelPath) ||
                 other.vadModelPath == vadModelPath));
@@ -628,12 +672,14 @@ class _TranscribeRequestDto extends TranscribeRequestDto {
       isRealtime,
       diarize,
       speedUp,
+      useGpu,
+      flashAttn,
       vadMode,
       vadModelPath);
 
   @override
   String toString() {
-    return 'TranscribeRequestDto(audio: $audio, model: $model, isTranslate: $isTranslate, threads: $threads, isVerbose: $isVerbose, language: $language, isSpecialTokens: $isSpecialTokens, isNoTimestamps: $isNoTimestamps, nProcessors: $nProcessors, splitOnWord: $splitOnWord, noFallback: $noFallback, isRealtime: $isRealtime, diarize: $diarize, speedUp: $speedUp, vadMode: $vadMode, vadModelPath: $vadModelPath)';
+    return 'TranscribeRequestDto(audio: $audio, model: $model, isTranslate: $isTranslate, threads: $threads, isVerbose: $isVerbose, language: $language, isSpecialTokens: $isSpecialTokens, isNoTimestamps: $isNoTimestamps, nProcessors: $nProcessors, splitOnWord: $splitOnWord, noFallback: $noFallback, isRealtime: $isRealtime, diarize: $diarize, speedUp: $speedUp, useGpu: $useGpu, flashAttn: $flashAttn, vadMode: $vadMode, vadModelPath: $vadModelPath)';
   }
 }
 
@@ -660,6 +706,8 @@ abstract mixin class _$TranscribeRequestDtoCopyWith<$Res>
       @JsonKey(name: 'is_realtime') bool isRealtime,
       bool diarize,
       @JsonKey(name: 'speed_up') bool speedUp,
+      @JsonKey(name: 'use_gpu') bool useGpu,
+      @JsonKey(name: 'flash_attn') bool flashAttn,
       @JsonKey(name: 'vad_mode') String vadMode,
       @JsonKey(name: 'vad_model_path') String? vadModelPath});
 }
@@ -691,6 +739,8 @@ class __$TranscribeRequestDtoCopyWithImpl<$Res>
     Object? isRealtime = null,
     Object? diarize = null,
     Object? speedUp = null,
+    Object? useGpu = null,
+    Object? flashAttn = null,
     Object? vadMode = null,
     Object? vadModelPath = freezed,
   }) {
@@ -750,6 +800,14 @@ class __$TranscribeRequestDtoCopyWithImpl<$Res>
       speedUp: null == speedUp
           ? _self.speedUp
           : speedUp // ignore: cast_nullable_to_non_nullable
+              as bool,
+      useGpu: null == useGpu
+          ? _self.useGpu
+          : useGpu // ignore: cast_nullable_to_non_nullable
+              as bool,
+      flashAttn: null == flashAttn
+          ? _self.flashAttn
+          : flashAttn // ignore: cast_nullable_to_non_nullable
               as bool,
       vadMode: null == vadMode
           ? _self.vadMode

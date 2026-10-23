@@ -31,6 +31,8 @@ abstract class TranscribeRequestDto
     @JsonKey(name: 'is_realtime') required bool isRealtime,
     required bool diarize,
     @JsonKey(name: 'speed_up') required bool speedUp,
+    @JsonKey(name: 'use_gpu') required bool useGpu,
+    @JsonKey(name: 'flash_attn') required bool flashAttn,
     @JsonKey(name: 'vad_mode') required String vadMode,
     @JsonKey(name: 'vad_model_path') String? vadModelPath,
   }) = _TranscribeRequestDto;
@@ -54,6 +56,8 @@ abstract class TranscribeRequestDto
       noFallback: request.noFallback,
       diarize: request.diarize,
       speedUp: request.speedUp,
+      useGpu: request.useGpu,
+      flashAttn: request.flashAttn,
       isRealtime: request.isRealtime,
       vadMode: request.vadMode.wireValue,
       vadModelPath: request.vadModelPath,

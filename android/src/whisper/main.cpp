@@ -149,8 +149,9 @@ json transcribe(json jsonBody)
         dispose_context_locked();
         
         whisper_context_params cparams = whisper_context_default_params();
-        cparams.use_gpu = false;
-        cparams.flash_attn = false;
+        // No GPU backend is compiled on Android; whisper.cpp falls back to CPU.
+        cparams.use_gpu = jsonBody.value("use_gpu", false);
+        cparams.flash_attn = jsonBody.value("flash_attn", false);
 
         g_ctx = whisper_init_from_file_with_params(params.model.c_str(), cparams);
         if (g_ctx != nullptr) {

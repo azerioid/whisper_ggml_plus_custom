@@ -23,6 +23,8 @@ _TranscribeRequestDto _$TranscribeRequestDtoFromJson(
       isRealtime: json['is_realtime'] as bool,
       diarize: json['diarize'] as bool,
       speedUp: json['speed_up'] as bool,
+      useGpu: json['use_gpu'] as bool,
+      flashAttn: json['flash_attn'] as bool,
       vadMode: json['vad_mode'] as String,
       vadModelPath: json['vad_model_path'] as String?,
     );
@@ -44,6 +46,8 @@ Map<String, dynamic> _$TranscribeRequestDtoToJson(
       'is_realtime': instance.isRealtime,
       'diarize': instance.diarize,
       'speed_up': instance.speedUp,
+      'use_gpu': instance.useGpu,
+      'flash_attn': instance.flashAttn,
       'vad_mode': instance.vadMode,
       'vad_model_path': instance.vadModelPath,
     };

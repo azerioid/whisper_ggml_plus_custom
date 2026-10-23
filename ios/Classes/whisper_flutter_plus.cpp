@@ -56,6 +56,8 @@ struct whisper_params
     bool verbose = false;
     bool print_special_tokens = false;
     bool speed_up = false;
+    bool use_gpu = false;
+    bool flash_attn = false;
     bool translate = false;
     bool diarize = false;
     bool no_fallback = false;
@@ -98,6 +100,8 @@ static std::string default_vad_model_path() {
 
 static struct whisper_context * g_ctx = nullptr;
 static std::string g_model_path = "";
+static bool g_use_gpu = false;
+static bool g_flash_attn = false;
 static std::mutex g_mutex;
 static std::atomic<bool> g_should_abort(false);
 
@@ -172,22 +176,29 @@ json transcribe(json jsonBody)
     params.split_on_word = jsonBody.value("split_on_word", false);
     params.diarize = jsonBody.value("diarize", false);
     params.speed_up = jsonBody.value("speed_up", false);
+    params.use_gpu = jsonBody.value("use_gpu", false);
+    params.flash_attn = jsonBody.value("flash_attn", false);
     params.vad_mode = parse_vad_mode(jsonBody);
     params.vad_model_path = jsonBody.value("vad_model_path", std::string(""));
 
     json jsonResult;
     jsonResult["@type"] = "transcribe";
 
-    if (g_ctx == nullptr || g_model_path != params.model) {
+    // The context is reused across calls; a different model or backend
+    // request rebuilds it. GPU/flash-attn default to off: the app opts in.
+    if (g_ctx == nullptr || g_model_path != params.model ||
+        g_use_gpu != params.use_gpu || g_flash_attn != params.flash_attn) {
         dispose_context_locked();
-        
+
         whisper_context_params cparams = whisper_context_default_params();
-        cparams.use_gpu = false; // Diagnostic mode: Disable Metal GPU to prevent native crashes
-        cparams.flash_attn = false; // Disabled: known to cause iOS Native Crashes
+        cparams.use_gpu = params.use_gpu;
+        cparams.flash_attn = params.flash_attn;
 
         g_ctx = whisper_init_from_file_with_params(params.model.c_str(), cparams);
         if (g_ctx != nullptr) {
             g_model_path = params.model;
+            g_use_gpu = params.use_gpu;
+            g_flash_attn = params.flash_attn;
         }
     }
 

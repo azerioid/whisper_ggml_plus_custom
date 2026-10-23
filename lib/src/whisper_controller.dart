@@ -38,6 +38,8 @@ class WhisperController {
     bool speedUp = false,
     WhisperVadMode vadMode = WhisperVadMode.auto,
     String? vadModelPath,
+    bool useGpu = false,
+    bool flashAttn = false,
   }) async {
     await initModel(model);
 
@@ -78,6 +80,8 @@ class WhisperController {
           isRealtime: true,
           diarize: diarize,
           speedUp: speedUp,
+          useGpu: useGpu,
+          flashAttn: flashAttn,
           vadMode: vadMode,
           vadModelPath: vadModelPath,
         ),

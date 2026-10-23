@@ -289,7 +289,7 @@ This fork includes targeted iOS-side changes in `ios/Classes/whisper_flutter_plu
 ### Stability and compatibility notes
 
 - Exported FFI symbols remain unchanged (`vpnai_whisper_request`, `vpnai_whisper_free_string`).
-- iOS context is still configured with `use_gpu=false` and `flash_attn=false` in this fork for stability-first behavior.
+- `v1.5.2-vna.4`: `transcribe(useGpu:, flashAttn:)` map to `whisper_context_params.use_gpu` / `flash_attn` (JSON keys `use_gpu`, `flash_attn`). Both default to `false`; the native context is rebuilt when they change. Android has no GPU backend compiled, so `useGpu` is a no-op there. The iOS podspec now compiles with `-O3 -DNDEBUG -DGGML_USE_ACCELERATE` and `-mcpu=apple-a11` on arm64 (FP16 arithmetic; iOS 16 already requires A11+).
 - Behavior for standard timestamped transcription remains compatible with existing API calls.
 
 ## Optional CoreML acceleration on iOS and macOS

@@ -27,6 +27,12 @@ mixin _$TranscribeRequest {
   bool get noFallback;
   bool get diarize;
   bool get speedUp;
+
+  /// iOS: run the encoder/decoder on Metal (whisper_context_params.use_gpu).
+  bool get useGpu;
+
+  /// Flash attention (only meaningful with [useGpu]).
+  bool get flashAttn;
   WhisperVadMode get vadMode;
   String? get vadModelPath;
   Stream<String>? get realtimeStream;
@@ -66,6 +72,9 @@ mixin _$TranscribeRequest {
                 other.noFallback == noFallback) &&
             (identical(other.diarize, diarize) || other.diarize == diarize) &&
             (identical(other.speedUp, speedUp) || other.speedUp == speedUp) &&
+            (identical(other.useGpu, useGpu) || other.useGpu == useGpu) &&
+            (identical(other.flashAttn, flashAttn) ||
+                other.flashAttn == flashAttn) &&
             (identical(other.vadMode, vadMode) || other.vadMode == vadMode) &&
             (identical(other.vadModelPath, vadModelPath) ||
                 other.vadModelPath == vadModelPath) &&
@@ -89,13 +98,15 @@ mixin _$TranscribeRequest {
       noFallback,
       diarize,
       speedUp,
+      useGpu,
+      flashAttn,
       vadMode,
       vadModelPath,
       realtimeStream);
 
   @override
   String toString() {
-    return 'TranscribeRequest(audio: $audio, isTranslate: $isTranslate, threads: $threads, isVerbose: $isVerbose, language: $language, isSpecialTokens: $isSpecialTokens, isNoTimestamps: $isNoTimestamps, isRealtime: $isRealtime, nProcessors: $nProcessors, splitOnWord: $splitOnWord, noFallback: $noFallback, diarize: $diarize, speedUp: $speedUp, vadMode: $vadMode, vadModelPath: $vadModelPath, realtimeStream: $realtimeStream)';
+    return 'TranscribeRequest(audio: $audio, isTranslate: $isTranslate, threads: $threads, isVerbose: $isVerbose, language: $language, isSpecialTokens: $isSpecialTokens, isNoTimestamps: $isNoTimestamps, isRealtime: $isRealtime, nProcessors: $nProcessors, splitOnWord: $splitOnWord, noFallback: $noFallback, diarize: $diarize, speedUp: $speedUp, useGpu: $useGpu, flashAttn: $flashAttn, vadMode: $vadMode, vadModelPath: $vadModelPath, realtimeStream: $realtimeStream)';
   }
 }
 
@@ -119,6 +130,8 @@ abstract mixin class $TranscribeRequestCopyWith<$Res> {
       bool noFallback,
       bool diarize,
       bool speedUp,
+      bool useGpu,
+      bool flashAttn,
       WhisperVadMode vadMode,
       String? vadModelPath,
       Stream<String>? realtimeStream});
@@ -150,6 +163,8 @@ class _$TranscribeRequestCopyWithImpl<$Res>
     Object? noFallback = null,
     Object? diarize = null,
     Object? speedUp = null,
+    Object? useGpu = null,
+    Object? flashAttn = null,
     Object? vadMode = null,
     Object? vadModelPath = freezed,
     Object? realtimeStream = freezed,
@@ -206,6 +221,14 @@ class _$TranscribeRequestCopyWithImpl<$Res>
       speedUp: null == speedUp
           ? _self.speedUp
           : speedUp // ignore: cast_nullable_to_non_nullable
+              as bool,
+      useGpu: null == useGpu
+          ? _self.useGpu
+          : useGpu // ignore: cast_nullable_to_non_nullable
+              as bool,
+      flashAttn: null == flashAttn
+          ? _self.flashAttn
+          : flashAttn // ignore: cast_nullable_to_non_nullable
               as bool,
       vadMode: null == vadMode
           ? _self.vadMode
@@ -330,6 +353,8 @@ extension TranscribeRequestPatterns on TranscribeRequest {
             bool noFallback,
             bool diarize,
             bool speedUp,
+            bool useGpu,
+            bool flashAttn,
             WhisperVadMode vadMode,
             String? vadModelPath,
             Stream<String>? realtimeStream)?
@@ -353,6 +378,8 @@ extension TranscribeRequestPatterns on TranscribeRequest {
             _that.noFallback,
             _that.diarize,
             _that.speedUp,
+            _that.useGpu,
+            _that.flashAttn,
             _that.vadMode,
             _that.vadModelPath,
             _that.realtimeStream);
@@ -390,6 +417,8 @@ extension TranscribeRequestPatterns on TranscribeRequest {
             bool noFallback,
             bool diarize,
             bool speedUp,
+            bool useGpu,
+            bool flashAttn,
             WhisperVadMode vadMode,
             String? vadModelPath,
             Stream<String>? realtimeStream)
@@ -412,6 +441,8 @@ extension TranscribeRequestPatterns on TranscribeRequest {
             _that.noFallback,
             _that.diarize,
             _that.speedUp,
+            _that.useGpu,
+            _that.flashAttn,
             _that.vadMode,
             _that.vadModelPath,
             _that.realtimeStream);
@@ -448,6 +479,8 @@ extension TranscribeRequestPatterns on TranscribeRequest {
             bool noFallback,
             bool diarize,
             bool speedUp,
+            bool useGpu,
+            bool flashAttn,
             WhisperVadMode vadMode,
             String? vadModelPath,
             Stream<String>? realtimeStream)?
@@ -470,6 +503,8 @@ extension TranscribeRequestPatterns on TranscribeRequest {
             _that.noFallback,
             _that.diarize,
             _that.speedUp,
+            _that.useGpu,
+            _that.flashAttn,
             _that.vadMode,
             _that.vadModelPath,
             _that.realtimeStream);
@@ -496,6 +531,8 @@ class _TranscribeRequest extends TranscribeRequest {
       this.noFallback = false,
       this.diarize = false,
       this.speedUp = false,
+      this.useGpu = false,
+      this.flashAttn = false,
       this.vadMode = WhisperVadMode.auto,
       this.vadModelPath,
       this.realtimeStream = null})
@@ -539,6 +576,16 @@ class _TranscribeRequest extends TranscribeRequest {
   @override
   @JsonKey()
   final bool speedUp;
+
+  /// iOS: run the encoder/decoder on Metal (whisper_context_params.use_gpu).
+  @override
+  @JsonKey()
+  final bool useGpu;
+
+  /// Flash attention (only meaningful with [useGpu]).
+  @override
+  @JsonKey()
+  final bool flashAttn;
   @override
   @JsonKey()
   final WhisperVadMode vadMode;
@@ -583,6 +630,9 @@ class _TranscribeRequest extends TranscribeRequest {
                 other.noFallback == noFallback) &&
             (identical(other.diarize, diarize) || other.diarize == diarize) &&
             (identical(other.speedUp, speedUp) || other.speedUp == speedUp) &&
+            (identical(other.useGpu, useGpu) || other.useGpu == useGpu) &&
+            (identical(other.flashAttn, flashAttn) ||
+                other.flashAttn == flashAttn) &&
             (identical(other.vadMode, vadMode) || other.vadMode == vadMode) &&
             (identical(other.vadModelPath, vadModelPath) ||
                 other.vadModelPath == vadModelPath) &&
@@ -606,13 +656,15 @@ class _TranscribeRequest extends TranscribeRequest {
       noFallback,
       diarize,
       speedUp,
+      useGpu,
+      flashAttn,
       vadMode,
       vadModelPath,
       realtimeStream);
 
   @override
   String toString() {
-    return 'TranscribeRequest(audio: $audio, isTranslate: $isTranslate, threads: $threads, isVerbose: $isVerbose, language: $language, isSpecialTokens: $isSpecialTokens, isNoTimestamps: $isNoTimestamps, isRealtime: $isRealtime, nProcessors: $nProcessors, splitOnWord: $splitOnWord, noFallback: $noFallback, diarize: $diarize, speedUp: $speedUp, vadMode: $vadMode, vadModelPath: $vadModelPath, realtimeStream: $realtimeStream)';
+    return 'TranscribeRequest(audio: $audio, isTranslate: $isTranslate, threads: $threads, isVerbose: $isVerbose, language: $language, isSpecialTokens: $isSpecialTokens, isNoTimestamps: $isNoTimestamps, isRealtime: $isRealtime, nProcessors: $nProcessors, splitOnWord: $splitOnWord, noFallback: $noFallback, diarize: $diarize, speedUp: $speedUp, useGpu: $useGpu, flashAttn: $flashAttn, vadMode: $vadMode, vadModelPath: $vadModelPath, realtimeStream: $realtimeStream)';
   }
 }
 
@@ -638,6 +690,8 @@ abstract mixin class _$TranscribeRequestCopyWith<$Res>
       bool noFallback,
       bool diarize,
       bool speedUp,
+      bool useGpu,
+      bool flashAttn,
       WhisperVadMode vadMode,
       String? vadModelPath,
       Stream<String>? realtimeStream});
@@ -669,6 +723,8 @@ class __$TranscribeRequestCopyWithImpl<$Res>
     Object? noFallback = null,
     Object? diarize = null,
     Object? speedUp = null,
+    Object? useGpu = null,
+    Object? flashAttn = null,
     Object? vadMode = null,
     Object? vadModelPath = freezed,
     Object? realtimeStream = freezed,
@@ -725,6 +781,14 @@ class __$TranscribeRequestCopyWithImpl<$Res>
       speedUp: null == speedUp
           ? _self.speedUp
           : speedUp // ignore: cast_nullable_to_non_nullable
+              as bool,
+      useGpu: null == useGpu
+          ? _self.useGpu
+          : useGpu // ignore: cast_nullable_to_non_nullable
+              as bool,
+      flashAttn: null == flashAttn
+          ? _self.flashAttn
+          : flashAttn // ignore: cast_nullable_to_non_nullable
               as bool,
       vadMode: null == vadMode
           ? _self.vadMode
