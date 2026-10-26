@@ -291,6 +291,7 @@ This fork includes targeted iOS-side changes in `ios/Classes/whisper_flutter_plu
 - Exported FFI symbols remain unchanged (`vpnai_whisper_request`, `vpnai_whisper_free_string`).
 - `v1.5.2-vna.4`: `transcribe(useGpu:, flashAttn:)` map to `whisper_context_params.use_gpu` / `flash_attn` (JSON keys `use_gpu`, `flash_attn`). Both default to `false`; the native context is rebuilt when they change. Android has no GPU backend compiled, so `useGpu` is a no-op there. The iOS podspec now compiles with `-O3 -DNDEBUG -DGGML_USE_ACCELERATE` and `-mcpu=apple-a11` on arm64 (FP16 arithmetic; iOS 16 already requires A11+).
 - `v1.5.2-vna.5`: Android arm64 builds ggml's CPU backend in variants (`GGML_CPU_ALL_VARIANTS` + `GGML_BACKEND_DL`: armv8.0, 8.2 dotprod, 8.2 dotprod+fp16, 8.6, 9.x) and `main.cpp` loads the best one the CPU supports, by name (directory scanning can't see libraries stored uncompressed in the APK). The Dart-facing library is now `libwhisper_flutter.so` (`libwhisper.so` is whisper.cpp's own shared library). whisper.cpp/ggml logs go to logcat (tag `whisper.cpp`) with per-call `whisper_print_timings`.
+- `v1.5.2-vna.6`: Android pins the transcribing thread to the N fastest cores (scheduler `cpu_capacity`, else max frequency) for the duration of `whisper_full`; ggml's per-compute workers inherit the mask, and the old mask is restored afterwards.
 - Behavior for standard timestamped transcription remains compatible with existing API calls.
 
 ## Optional CoreML acceleration on iOS and macOS

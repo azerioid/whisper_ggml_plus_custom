@@ -3,6 +3,10 @@
 #include "src/whisper.h"
 #include "ggml-backend.h"
 
+#include <sched.h>
+#include <unistd.h>
+#include <algorithm>
+
 #define DR_WAV_IMPLEMENTATION
 #include "src/examples/dr_wav.h"
 
@@ -127,6 +131,64 @@ static void load_cpu_backend_once() {
     });
 #endif
 }
+
+// Pins the calling thread to the n fastest cores for the lifetime of this
+// object. ggml spawns its workers per compute without an affinity of its own,
+// so they inherit this mask. Unpinned, the scheduler sometimes ran a worker
+// on a little core and every decode step waited for it (Galaxy A33, tiny:
+// 9 vs 22 ms per token between two identical runs). Cores are ranked by the
+// scheduler's cpu_capacity, else by max frequency; no ranking, no pinning.
+class ScopedFastCoreAffinity {
+public:
+    explicit ScopedFastCoreAffinity(int n_threads) {
+        const long n_cpus = sysconf(_SC_NPROCESSORS_CONF);
+        if (n_threads <= 0 || n_cpus <= n_threads || n_cpus > CPU_SETSIZE) return;
+        std::vector<std::pair<long, int>> ranked;
+        for (const char * file : {"cpu_capacity", "cpufreq/cpuinfo_max_freq"}) {
+            ranked.clear();
+            for (int cpu = 0; cpu < n_cpus; ++cpu) {
+                const long v = read_cpu_value(cpu, file);
+                if (v <= 0) break;
+                ranked.emplace_back(v, cpu);
+            }
+            if ((long) ranked.size() == n_cpus) break;
+        }
+        if ((long) ranked.size() != n_cpus) return;
+        std::stable_sort(ranked.begin(), ranked.end(),
+                         [](const auto & a, const auto & b) { return a.first > b.first; });
+        cpu_set_t set;
+        CPU_ZERO(&set);
+        std::string cores;
+        for (int i = 0; i < n_threads; ++i) {
+            CPU_SET(ranked[i].second, &set);
+            cores += std::to_string(ranked[i].second) + " ";
+        }
+        if (sched_getaffinity(0, sizeof(old_), &old_) != 0) return;
+        active_ = sched_setaffinity(0, sizeof(set), &set) == 0;
+        __android_log_print(ANDROID_LOG_INFO, "WhisperFlutter", "Pinned to cores: %s(%s)",
+                            cores.c_str(), active_ ? "ok" : "failed");
+    }
+    ~ScopedFastCoreAffinity() {
+        if (active_) sched_setaffinity(0, sizeof(old_), &old_);
+    }
+    ScopedFastCoreAffinity(const ScopedFastCoreAffinity &) = delete;
+    ScopedFastCoreAffinity & operator=(const ScopedFastCoreAffinity &) = delete;
+
+private:
+    static long read_cpu_value(int cpu, const char * file) {
+        const std::string path =
+            "/sys/devices/system/cpu/cpu" + std::to_string(cpu) + "/" + file;
+        FILE * f = fopen(path.c_str(), "r");
+        if (!f) return -1;
+        long v = -1;
+        if (fscanf(f, "%ld", &v) != 1) v = -1;
+        fclose(f);
+        return v;
+    }
+
+    cpu_set_t old_{};
+    bool active_ = false;
+};
 
 static void dispose_context_locked() {
     if (g_ctx != nullptr) {
@@ -291,7 +353,12 @@ json transcribe(json jsonBody)
     auto start_time = std::chrono::high_resolution_clock::now();
 
     whisper_reset_timings(g_ctx);
-    if (whisper_full(g_ctx, wparams, pcmf32.data(), pcmf32.size()) != 0)
+    int full_status;
+    {
+        ScopedFastCoreAffinity pin(wparams.n_threads);
+        full_status = whisper_full(g_ctx, wparams, pcmf32.data(), pcmf32.size());
+    }
+    if (full_status != 0)
     {
         if (g_should_abort.load()) {
             jsonResult["@type"] = "aborted";
