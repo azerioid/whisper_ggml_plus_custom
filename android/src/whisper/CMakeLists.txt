@@ -11,7 +11,18 @@ set(WHISPER_VENDOR_DIR "${CMAKE_CURRENT_LIST_DIR}/src")
 set(GGML_VENDOR_DIR "${WHISPER_VENDOR_DIR}/ggml")
 set(WHISPER_ENGINE_DIR "${WHISPER_VENDOR_DIR}/src")
 
-set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+# arm64: ggml's CPU backend is built in several variants (armv8.0, 8.2 with
+# dotprod, 8.2 with dotprod+fp16, 8.6 with i8mm) and main.cpp loads the best
+# one the phone supports. A single build for the newest CPUs would SIGILL on
+# Cortex-A53 phones; the old single armv8.0 build left 1.5-2x on the table.
+# Runtime loading needs ggml as shared libraries.
+if (ANDROID_ABI STREQUAL "arm64-v8a")
+    set(BUILD_SHARED_LIBS ON CACHE BOOL "" FORCE)
+    set(GGML_BACKEND_DL ON CACHE BOOL "" FORCE)
+    set(GGML_CPU_ALL_VARIANTS ON CACHE BOOL "" FORCE)
+else()
+    set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+endif()
 set(GGML_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GGML_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(GGML_CPU ON CACHE BOOL "" FORCE)
@@ -52,7 +63,8 @@ if (ANDROID)
     )
 endif()
 
+# Not "whisper": with shared libs that name is whisper.cpp's own library.
 set_target_properties(whisper_flutter PROPERTIES
     PUBLIC_HEADER src/whisper.h
-    OUTPUT_NAME "whisper"
+    OUTPUT_NAME "whisper_flutter"
 )

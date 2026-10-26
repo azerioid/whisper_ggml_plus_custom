@@ -1,6 +1,7 @@
 #include <android/log.h>
 #include "main.h"
 #include "src/whisper.h"
+#include "ggml-backend.h"
 
 #define DR_WAV_IMPLEMENTATION
 #include "src/examples/dr_wav.h"
@@ -87,6 +88,46 @@ static std::string g_model_path = "";
 static std::mutex g_mutex;
 static std::atomic<bool> g_should_abort(false);
 
+// arm64 builds the CPU backend in variants (see CMakeLists.txt). ggml's own
+// loader scans a directory, which can't see libraries stored uncompressed
+// inside the APK, so try the known names best first: a variant whose
+// instructions this CPU lacks scores 0 and ggml_backend_load skips it.
+// whisper.cpp/ggml log to stderr, which Android drops. Route them to
+// logcat (tag "whisper.cpp") so per-call timings (load / encode / decode /
+// fallback passes) can be read on a device.
+static void android_log_cb(enum ggml_log_level level, const char * text, void *) {
+    const int prio = level == GGML_LOG_LEVEL_ERROR ? ANDROID_LOG_ERROR
+                   : level == GGML_LOG_LEVEL_WARN  ? ANDROID_LOG_WARN
+                   : ANDROID_LOG_INFO;
+    __android_log_write(prio, "whisper.cpp", text);
+}
+
+static void load_cpu_backend_once() {
+    static std::once_flag log_once;
+    std::call_once(log_once, [] { whisper_log_set(android_log_cb, nullptr); });
+#ifdef GGML_BACKEND_DL
+    static std::once_flag once;
+    std::call_once(once, [] {
+        static const char * variants[] = {
+            "libggml-cpu-android_armv9.2_2.so",
+            "libggml-cpu-android_armv9.2_1.so",
+            "libggml-cpu-android_armv9.0_1.so",
+            "libggml-cpu-android_armv8.6_1.so",
+            "libggml-cpu-android_armv8.2_2.so",
+            "libggml-cpu-android_armv8.2_1.so",
+            "libggml-cpu-android_armv8.0_1.so",
+        };
+        for (const char * name : variants) {
+            if (ggml_backend_load(name) != nullptr) {
+                __android_log_print(ANDROID_LOG_INFO, "WhisperFlutter", "CPU backend: %s", name);
+                return;
+            }
+        }
+        __android_log_print(ANDROID_LOG_ERROR, "WhisperFlutter", "No CPU backend variant could be loaded");
+    });
+#endif
+}
+
 static void dispose_context_locked() {
     if (g_ctx != nullptr) {
         whisper_free(g_ctx);
@@ -153,6 +194,7 @@ json transcribe(json jsonBody)
         cparams.use_gpu = jsonBody.value("use_gpu", false);
         cparams.flash_attn = jsonBody.value("flash_attn", false);
 
+        load_cpu_backend_once();
         g_ctx = whisper_init_from_file_with_params(params.model.c_str(), cparams);
         if (g_ctx != nullptr) {
             g_model_path = params.model;
@@ -248,6 +290,7 @@ json transcribe(json jsonBody)
 
     auto start_time = std::chrono::high_resolution_clock::now();
 
+    whisper_reset_timings(g_ctx);
     if (whisper_full(g_ctx, wparams, pcmf32.data(), pcmf32.size()) != 0)
     {
         if (g_should_abort.load()) {
@@ -265,6 +308,7 @@ json transcribe(json jsonBody)
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
 
     __android_log_print(ANDROID_LOG_DEBUG, "WhisperFlutter", "[DEBUG] Transcription completed in %lldms", (int)duration);
+    whisper_print_timings(g_ctx);
 
     const int n_segments = whisper_full_n_segments(g_ctx);
     std::vector<json> segmentsJson = {};

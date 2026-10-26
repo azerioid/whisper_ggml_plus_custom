@@ -39,7 +39,7 @@ class Whisper {
 
   DynamicLibrary _openLib() {
     if (Platform.isAndroid) {
-      return DynamicLibrary.open('libwhisper.so');
+      return DynamicLibrary.open('libwhisper_flutter.so');
     } else if (Platform.isWindows) {
       return DynamicLibrary.open('whisper_ggml_plus.dll');
     } else {
