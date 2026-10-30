@@ -28,7 +28,10 @@ enum WhisperModel {
   smallEn('small.en'),
 
   /// medium model for english only
-  mediumEn('medium.en');
+  mediumEn('medium.en'),
+
+  /// small model fine-tuned for Azerbaijani (LocalDoc), q5_0
+  azerbaijaniSmall('azerbaijani-whisper-small-q5_0');
 
   const WhisperModel(this.modelName);
 
@@ -37,6 +40,11 @@ enum WhisperModel {
 
   /// Huggingface url to download model
   Uri get modelUri {
+    if (this == WhisperModel.azerbaijaniSmall) {
+      return Uri.parse(
+        'https://huggingface.co/mirza234/azerbaijani-whisper-small-ggml/resolve/a932c6bdf49ea5e16604795d8ee8e12845e14286/ggml-$modelName.bin',
+      );
+    }
     return Uri.parse(
       'https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-$modelName.bin',
     );
